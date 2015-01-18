@@ -60,6 +60,7 @@
     <Compile Include="AlgorithmTests\TripleDESTests.cs" />
     <Compile Include="AlgorithmTests\DESTests.cs" />
     <Compile Include="AlgorithmTests\RC2Tests.cs" />
+    <Compile Include="SimpleEncryption\SimpleEncryptionTests.cs" />
     <Compile Include="StringTransformerTests\AsciiTransformerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringTransformerTests\Utf8TransformerTests.cs" />

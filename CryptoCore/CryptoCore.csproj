@@ -54,6 +54,7 @@
     <Compile Include="Algorithms\TripleDESAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecureRandom.cs" />
+    <Compile Include="SimpleEncryption.cs" />
     <Compile Include="StringTransformers\AsciiTransformer.cs" />
     <Compile Include="StringTransformers\Base64Transformer.cs" />
     <Compile Include="StringTransformers\HexTransformer.cs" />
