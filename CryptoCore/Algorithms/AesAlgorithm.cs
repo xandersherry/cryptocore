@@ -2,6 +2,11 @@
 
 namespace Xeres.CryptoCore.Algorithms
 {
+    /// <summary>
+    /// AES is an authenticated algorithm, protecting message integrity through
+    /// the use of encrypt-then-MAC using a configurable HMAC variant.  The 
+    /// default configuration uses HMAC-SHA256.  
+    /// </summary>
     public class AesAlgorithm : ISymmetricEncryptionAlgorithm
     {
         private AesCryptoServiceProvider algorithmInstance = new AesCryptoServiceProvider();

@@ -2,6 +2,14 @@
 
 namespace Xeres.CryptoCore.Algorithms
 {
+    /// <summary>
+    /// Rijndeal is a symmetric encryption algorithm, and this un-authenticated
+    /// form is included for backwards compatibility purposes only.  It should 
+    /// not be used for new systems unless a suitable  authentication mechanism 
+    /// is also implemented and used to ensure message integrity.  Generally 
+    /// the AuthenticatedSymmetricEncryption API and the algorithms it supports
+    /// should be used instead.
+    /// </summary>
     public class RijndaelAlgorithm : ISymmetricEncryptionAlgorithm
     {
         private RijndaelManaged algorithmInstance = new RijndaelManaged();

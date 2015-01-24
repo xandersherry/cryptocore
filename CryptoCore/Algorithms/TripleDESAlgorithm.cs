@@ -2,6 +2,12 @@
 
 namespace Xeres.CryptoCore.Algorithms
 {
+    /// <summary>
+    /// Triple-DES is a symmetric encryption algorithm included for backwards
+    /// compatibility purposes only.  It should not be used for new systems 
+    /// for any reason;  the AuthenticatedSymmetricEncryption API and the 
+    /// algorithms it supports should be used instead.
+    /// </summary>
     public class TripleDESAlgorithm : ISymmetricEncryptionAlgorithm
     {
         private TripleDESCryptoServiceProvider algorithmInstance = new TripleDESCryptoServiceProvider();

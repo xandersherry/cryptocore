@@ -8,6 +8,12 @@ using Xeres.CryptoCore.StringTransformers;
 
 namespace Xeres.CryptoCore
 {
+    /// <summary>
+    /// The SimpleEncryption API provides the simplest way to securely encrypt
+    /// and decrypt data for use in a .NET application.  It provides 
+    /// authenticated encryption to ensure both the confidentially and integrity
+    /// of messages protected by this API.  
+    /// </summary>
     public static class SimpleEncryption
     {
         private const int IV_LENGTH = 12;

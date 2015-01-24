@@ -4,6 +4,11 @@ using ClrSecurity = Security.Cryptography;
 
 namespace Xeres.CryptoCore.Algorithms
 {
+    /// <summary>
+    /// AuthenticatedAES is an AEAD algorithm implementing the CNG
+    /// modes of operation on top of AES.  It supports both GCM and CCM modes
+    /// of operation to provide both confidentiality and integrity of messages. 
+    /// </summary>
     public class AuthenticatedAesAlgorithm : ICngSymmetricEncryptionAlgorithm
     {
         private ClrSecurity.AuthenticatedAesCng algorithmInstance = new ClrSecurity.AuthenticatedAesCng();

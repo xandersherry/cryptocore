@@ -5,6 +5,11 @@ using Security.Cryptography;
 
 namespace Xeres.CryptoCore
 {
+    /// <summary>
+    /// AuthenticatedSymmetricEncryption is the API for authenticated 
+    /// symmetric encrpytion, and is the preferred API when you require
+    /// more flexibility than is provided by the SimpleEncryption API. 
+    /// </summary>
     public class AuthenticatedSymmetricEncryption : SymmetricEncryption
     {
 

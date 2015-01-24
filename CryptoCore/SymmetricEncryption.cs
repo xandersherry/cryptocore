@@ -8,6 +8,15 @@ using System.Threading.Tasks;
 
 namespace Xeres.CryptoCore
 {
+    /// <summary>
+    /// The SymmetricEncryption API is generally for backwards compatibility
+    /// purposes only.  It is an API for un-authenticated symmetric encryption
+    /// which means that in order to implemented it securely an authentication
+    /// mechananism to ensure message integrity must also be implemented and 
+    /// used.
+    /// You should generally prefer to use the AuthenticatedSymmetricEncryption
+    /// API instead, which integrates message authentication automatically.
+    /// </summary>
     public class SymmetricEncryption
     {
         public virtual byte[] Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)

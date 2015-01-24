@@ -2,6 +2,14 @@
 
 namespace Xeres.CryptoCore.Algorithms
 {
+    /// <summary>
+    /// DES is a symmetric encryption algorithm included for backwards
+    /// compatibility purposes and only for existing systems that already use 
+    /// it and cannot be updated to support a secure algorithm. It should not 
+    /// be used for new systems for any reason; 
+    /// the AuthenticatedSymmetricEncryption API and the algorithms it supports 
+    /// should be used instead.
+    /// </summary>
     public class DESAlgorithm : ISymmetricEncryptionAlgorithm
     {
         private DESCryptoServiceProvider algorithmInstance = new DESCryptoServiceProvider();
