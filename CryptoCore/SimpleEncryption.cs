@@ -18,10 +18,10 @@ namespace Xeres.CryptoCore
     {
         private const int IV_LENGTH = 12;
         private const int TAG_LENGTH = 16;
-        private const int KEY_LENGTH = 32;
+        private const int KEY_LENGTH = 16;
 
         /// <summary>
-        /// Generates a new random, Base-64 encoded, 256-bit key
+        /// Generates a new random, Base-64 encoded, 128-bit key
         /// </summary>
         /// <returns>Base-64 encoded string</returns>
         public static string GenerateKey()
@@ -32,7 +32,7 @@ namespace Xeres.CryptoCore
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key">A Base-64 encoded, 256-bit key</param>
+        /// <param name="key">A Base-64 encoded, 128-bit key</param>
         /// <param name="plaintext">A UTF-8 string that is the plaintext message to be encrypted</param>
         /// <returns>Base-64 encoded string that includes an IV, a tag, and the ciphertext of the data encrypted with the key</returns>
         public static string Encrypt(string key, string plaintext)
@@ -58,7 +58,7 @@ namespace Xeres.CryptoCore
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key">A Base-64 encoded, 256-bit key</param>
+        /// <param name="key">A Base-64 encoded, 128-bit key</param>
         /// <param name="encryptedData">The Base-64 encoded string containing the IV, tag, and ciphertext</param>
         /// <returns>A UTF-8 string containing the plaintext message</returns>
         public static string Decrypt(string key, string encryptedData)
