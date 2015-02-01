@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 
 namespace Xeres.CryptoCore.Algorithms
 {
@@ -10,6 +11,7 @@ namespace Xeres.CryptoCore.Algorithms
     /// the AuthenticatedSymmetricEncryption API and the algorithms it supports 
     /// should be used instead.
     /// </summary>
+    [Obsolete("This algorithm is obsolete and unsafe. Use AuthenticatedSymmetricEncryption and one of the algorithms it supports instead.", false)]
     public class RC2Algorithm : ISymmetricEncryptionAlgorithm
     {
         private RC2CryptoServiceProvider algorithmInstance = new RC2CryptoServiceProvider();
@@ -51,6 +53,12 @@ namespace Xeres.CryptoCore.Algorithms
             {
                 algorithmInstance.IV = value;
             }
+        }
+
+        public CipherMode Mode
+        {
+            get { return algorithmInstance.Mode; }
+            set { algorithmInstance.Mode = value; }
         }
 
         public bool IsCngAlgorithm

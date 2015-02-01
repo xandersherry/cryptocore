@@ -20,7 +20,7 @@ namespace CryptoCoreTests.AlgorithmTests
         private ISymmetricEncryptionAlgorithm dAlgorithm = null;
         private IStringTransformer transformer = null;
         private byte[] key = null;
-        private byte[] iv = null;
+
 
         [TestInitialize]
         public void AesTestSetup()
@@ -31,7 +31,6 @@ namespace CryptoCoreTests.AlgorithmTests
             dAlgorithm = new AesAlgorithm();
             transformer = new UTF8Transformer();
             key = SecureRandom.GetRandomBytes(32);
-            iv = SecureRandom.GetRandomBytes(16);
         }
 
         [TestMethod]
@@ -39,13 +38,12 @@ namespace CryptoCoreTests.AlgorithmTests
         {
 
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
    
 
             dAlgorithm.Key = key;
-            dAlgorithm.IV = iv;
+            dAlgorithm.IV = eAlgorithm.IV;
 
             byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
             Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
@@ -56,13 +54,13 @@ namespace CryptoCoreTests.AlgorithmTests
         {
 
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
+
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearTextWithExtendedCharacters));
 
 
             dAlgorithm.Key = key;
-            dAlgorithm.IV = iv;
+            dAlgorithm.IV = eAlgorithm.IV;
 
             byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
             Assert.AreEqual(testClearTextWithExtendedCharacters, transformer.GetString(decryptedPlainText));
@@ -73,13 +71,13 @@ namespace CryptoCoreTests.AlgorithmTests
         {
 
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
+
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearTextWithChineseCharacters));
 
 
             dAlgorithm.Key = key;
-            dAlgorithm.IV = iv;
+            dAlgorithm.IV = eAlgorithm.IV;
 
             byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
             Assert.AreEqual(testClearTextWithChineseCharacters, transformer.GetString(decryptedPlainText));
@@ -90,13 +88,12 @@ namespace CryptoCoreTests.AlgorithmTests
         public void AES_Decrypting_With_Incorrect_Key_Fails()
         {
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
 
 
             dAlgorithm.Key = SecureRandom.GetRandomBytes(32);
-            dAlgorithm.IV = iv;
+            dAlgorithm.IV = eAlgorithm.IV;
 
             Exception ex = null;
             byte[] decryptedPlainText = new byte[1];
@@ -116,7 +113,7 @@ namespace CryptoCoreTests.AlgorithmTests
         public void AES_Decrypting_With_Incorrect_IV_Fails()
         {
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
+
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
 

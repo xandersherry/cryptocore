@@ -21,6 +21,7 @@ namespace Xeres.CryptoCore
         public override byte[] Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)
         {
             byte[] encryptedData;
+            algorithm.Instance.GenerateIV();
             if (algorithm.IsCngAlgorithm)
             {
                 ICngSymmetricEncryptionAlgorithm internalAlgorithm = (ICngSymmetricEncryptionAlgorithm) algorithm;

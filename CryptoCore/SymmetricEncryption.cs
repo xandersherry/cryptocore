@@ -21,6 +21,7 @@ namespace Xeres.CryptoCore
     {
         public virtual byte[] Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)
         {
+            algorithm.Instance.GenerateIV();
             using (MemoryStream memStreamEncryptedData = new MemoryStream())
             {
 

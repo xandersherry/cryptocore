@@ -31,10 +31,17 @@ namespace Xeres.CryptoCore.Algorithms
             set { algorithmInstance.Key = value; }
         }
 
+        
         public byte[] IV
         {
             get { return algorithmInstance.IV; }
             set { algorithmInstance.IV = value; }
+        }
+
+        public CipherMode Mode
+        {
+            get { return algorithmInstance.Mode; }
+            set { algorithmInstance.Mode = value; }
         }
 
         public bool IsCngAlgorithm

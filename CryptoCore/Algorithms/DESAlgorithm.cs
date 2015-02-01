@@ -1,7 +1,9 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 
 namespace Xeres.CryptoCore.Algorithms
 {
+
     /// <summary>
     /// DES is a symmetric encryption algorithm included for backwards
     /// compatibility purposes and only for existing systems that already use 
@@ -10,6 +12,7 @@ namespace Xeres.CryptoCore.Algorithms
     /// the AuthenticatedSymmetricEncryption API and the algorithms it supports 
     /// should be used instead.
     /// </summary>
+    [Obsolete("This algorithm is obsolete and unsafe. Use AuthenticatedSymmetricEncryption and one of the algorithms it supports instead.", false)]
     public class DESAlgorithm : ISymmetricEncryptionAlgorithm
     {
         private DESCryptoServiceProvider algorithmInstance = new DESCryptoServiceProvider();
@@ -51,6 +54,12 @@ namespace Xeres.CryptoCore.Algorithms
             {
                 algorithmInstance.IV = value;
             }
+        }
+
+        public CipherMode Mode
+        {
+            get { return algorithmInstance.Mode; }
+            set { algorithmInstance.Mode = value; }
         }
 
         public bool IsCngAlgorithm

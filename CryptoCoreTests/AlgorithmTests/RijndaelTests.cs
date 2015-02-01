@@ -16,7 +16,7 @@ namespace CryptoCoreTests.AlgorithmTests
         private ISymmetricEncryptionAlgorithm dAlgorithm = null;
         private AsciiTransformer transformer = null;
         private byte[] key = null;
-        private byte[] iv = null;
+
 
         [TestInitialize]
         public void RijndaelTestSetup()
@@ -27,7 +27,7 @@ namespace CryptoCoreTests.AlgorithmTests
             dAlgorithm = new RijndaelAlgorithm();
             transformer = new AsciiTransformer();
             key = SecureRandom.GetRandomBytes(16);
-            iv = SecureRandom.GetRandomBytes(16);
+
         }
 
         [TestMethod]
@@ -35,13 +35,13 @@ namespace CryptoCoreTests.AlgorithmTests
         {
 
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
+
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
 
 
             dAlgorithm.Key = key;
-            dAlgorithm.IV = iv;
+            dAlgorithm.IV = eAlgorithm.IV;
 
             byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
             Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
@@ -50,13 +50,13 @@ namespace CryptoCoreTests.AlgorithmTests
         public void Rijndael_Decrypting_With_Incorrect_Key_Fails()
         {
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
+
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
 
 
             dAlgorithm.Key = SecureRandom.GetRandomBytes(16);
-            dAlgorithm.IV = iv;
+            dAlgorithm.IV = eAlgorithm.IV;
 
             Exception ex = null;
             byte[] decryptedPlainText = new byte[1];
@@ -76,7 +76,7 @@ namespace CryptoCoreTests.AlgorithmTests
         public void Rijndael_Decrypting_With_Incorrect_IV_Fails()
         {
             eAlgorithm.Key = key;
-            eAlgorithm.IV = iv;
+
 
             byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
 

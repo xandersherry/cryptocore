@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 
 namespace Xeres.CryptoCore.Algorithms
 {
@@ -8,6 +9,7 @@ namespace Xeres.CryptoCore.Algorithms
     /// for any reason;  the AuthenticatedSymmetricEncryption API and the 
     /// algorithms it supports should be used instead.
     /// </summary>
+    [Obsolete("This algorithm is obsolete. Use AuthenticatedSymmetricEncryption and one of the algorithms it supports instead.", false)]
     public class TripleDESAlgorithm : ISymmetricEncryptionAlgorithm
     {
         private TripleDESCryptoServiceProvider algorithmInstance = new TripleDESCryptoServiceProvider();
@@ -49,6 +51,12 @@ namespace Xeres.CryptoCore.Algorithms
             {
                 algorithmInstance.IV = value;
             }
+        }
+
+        public CipherMode Mode
+        {
+            get { return algorithmInstance.Mode; }
+            set { algorithmInstance.Mode = value; }
         }
 
         public bool IsCngAlgorithm

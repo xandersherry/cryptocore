@@ -47,6 +47,7 @@
     <Compile Include="Algorithms\AuthenticatedAesAlgorithm.cs" />
     <Compile Include="Algorithms\DESAlgorithm.cs" />
     <Compile Include="AuthenticatedSymmetricEncryption.cs" />
+    <Compile Include="EncryptedData.cs" />
     <Compile Include="ICngSymmetricEncryptionAlgorithm.cs" />
     <Compile Include="ISymmetricEncryptionAlgorithm.cs" />
     <Compile Include="Algorithms\RC2Algorithm.cs" />
