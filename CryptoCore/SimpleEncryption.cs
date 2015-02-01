@@ -16,6 +16,8 @@ namespace Xeres.CryptoCore
     /// </summary>
     public static class SimpleEncryption
     {
+        private const ushort CURRENT_VERSION = 1;
+        private const int VERSION_LENGTH = 2;  
         private const int IV_LENGTH = 12;
         private const int TAG_LENGTH = 16;
         private const int KEY_LENGTH = 16;
@@ -43,13 +45,15 @@ namespace Xeres.CryptoCore
             
             algorithm.Key = Convert.FromBase64String(key);
             algorithm.IV = SecureRandom.GetRandomBytes(IV_LENGTH);
+            algorithm.AdditionalAuthenticatedData = BitConverter.GetBytes(CURRENT_VERSION);
 
             EncryptedData encryptedData = encryptor.Encrypt(algorithm, transformer.GetBytes(plaintext));
 
-            byte[] output = new byte[encryptedData.IV.Length + encryptedData.Tag.Length + encryptedData.Ciphertext.Length];
-            Buffer.BlockCopy(encryptedData.IV, 0, output, 0, encryptedData.IV.Length);
-            Buffer.BlockCopy(encryptedData.Tag, 0, output, algorithm.IV.Length, encryptedData.Tag.Length);
-            Buffer.BlockCopy(encryptedData.Ciphertext, 0, output, algorithm.IV.Length + encryptedData.Tag.Length, encryptedData.Ciphertext.Length);
+            byte[] output = new byte[VERSION_LENGTH + IV_LENGTH + TAG_LENGTH + encryptedData.Ciphertext.Length];
+            Buffer.BlockCopy(BitConverter.GetBytes(CURRENT_VERSION), 0, output, 0, VERSION_LENGTH);
+            Buffer.BlockCopy(encryptedData.IV, 0, output, VERSION_LENGTH, IV_LENGTH);
+            Buffer.BlockCopy(encryptedData.Tag, 0, output, VERSION_LENGTH + IV_LENGTH, TAG_LENGTH);
+            Buffer.BlockCopy(encryptedData.Ciphertext, 0, output, VERSION_LENGTH + IV_LENGTH + TAG_LENGTH, encryptedData.Ciphertext.Length);
 
             return Convert.ToBase64String(output);
         }
@@ -63,14 +67,15 @@ namespace Xeres.CryptoCore
         public static string Decrypt(string key, string encryptedData)
         {
             byte[] input = Convert.FromBase64String(encryptedData);
-
+            byte[] versionBytes = new byte[VERSION_LENGTH];
             byte[] iv = new byte[IV_LENGTH];
             byte[] tag = new byte[TAG_LENGTH];
-            byte[] ciphertext = new byte[input.Length - (IV_LENGTH + TAG_LENGTH)];
+            byte[] ciphertext = new byte[input.Length - (VERSION_LENGTH + IV_LENGTH + TAG_LENGTH)];
 
-            Buffer.BlockCopy(input, 0, iv, 0, IV_LENGTH);
-            Buffer.BlockCopy(input, IV_LENGTH, tag, 0, TAG_LENGTH);
-            Buffer.BlockCopy(input, (IV_LENGTH + TAG_LENGTH), ciphertext, 0, ciphertext.Length);
+            Buffer.BlockCopy(input, 0, versionBytes, 0, VERSION_LENGTH);
+            Buffer.BlockCopy(input, VERSION_LENGTH, iv, 0, IV_LENGTH);
+            Buffer.BlockCopy(input, VERSION_LENGTH + IV_LENGTH, tag, 0, TAG_LENGTH);
+            Buffer.BlockCopy(input, VERSION_LENGTH + IV_LENGTH + TAG_LENGTH, ciphertext, 0, ciphertext.Length);
 
             AuthenticatedAesAlgorithm algorithm = new AuthenticatedAesAlgorithm();
             AuthenticatedSymmetricEncryption decryptor = new AuthenticatedSymmetricEncryption();
@@ -79,6 +84,7 @@ namespace Xeres.CryptoCore
             algorithm.Key = Convert.FromBase64String(key);
             algorithm.IV = iv;
             algorithm.Tag = tag;
+            algorithm.AdditionalAuthenticatedData = versionBytes;
 
             return transformer.GetString(decryptor.Decrypt(algorithm, ciphertext));   
         }
