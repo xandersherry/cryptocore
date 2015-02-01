@@ -1,4 +1,4 @@
-cryptocore
+CryptoCore
 ==========
 
 A cryptographic library for .NET
