@@ -50,6 +50,22 @@ namespace CryptoCoreTests.AlgorithmTests
             Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
+
+        [TestMethod]
+        public void AES_CFB_Mode_Encrypting_And_Decrypting_Results_In_Same_String()
+        {
+            eAlgorithm.Mode = CipherMode.CFB;
+
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
+
+            dAlgorithm.Mode = CipherMode.CFB;
+            dAlgorithm.IV = encryptedData.IV;
+
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
+
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
+        }
+
         [TestMethod]
         public void AES_Encrypting_And_Decrypting_String_With_ExtendedCharacters_Results_In_Same_String()
         {
@@ -129,6 +145,25 @@ namespace CryptoCoreTests.AlgorithmTests
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA256(){Key = validationKey};
             authenticatedDecrytor.Tag = encryptedData.Tag;
             dAlgorithm.IV = encryptedData.IV;
+
+            byte[] decryptedPlaintext = authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
+
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
+        }
+
+        [TestMethod]
+        public void AE_CFB_Mode_Encrypting_and_Decrypting_With_HMACSHA256_Succeeds_and_Results_in_Same_String()
+        {
+            validationKey = SecureRandom.GetRandomBytes(32);
+            authenticatedEncryptor.HMACAlgorithm = new HMACSHA256() { Key = validationKey };
+            eAlgorithm.Mode = CipherMode.CFB;
+            
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
+
+            authenticatedDecrytor.HMACAlgorithm = new HMACSHA256() { Key = validationKey };
+            authenticatedDecrytor.Tag = encryptedData.Tag;
+            dAlgorithm.IV = encryptedData.IV;
+            dAlgorithm.Mode = CipherMode.CFB;
 
             byte[] decryptedPlaintext = authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 

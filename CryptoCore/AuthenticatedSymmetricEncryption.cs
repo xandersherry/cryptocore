@@ -123,7 +123,7 @@ namespace Xeres.CryptoCore
 
         private byte[] _tag;
         public byte[] Tag { set { _tag = value; }}
-        public byte[] GetTag()
+        internal byte[] GetTag()
         {
             return _tag;
         }
