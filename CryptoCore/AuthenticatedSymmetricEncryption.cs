@@ -18,10 +18,11 @@ namespace Xeres.CryptoCore
             HMACAlgorithm = new HMACSHA256();
         }
 
-        public override byte[] Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)
+        public override EncryptedData Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)
         {
-            byte[] encryptedData;
             algorithm.Instance.GenerateIV();
+            EncryptedData encryptedData = new EncryptedData() {IV = algorithm.IV};
+
             if (algorithm.IsCngAlgorithm)
             {
                 ICngSymmetricEncryptionAlgorithm internalAlgorithm = (ICngSymmetricEncryptionAlgorithm) algorithm;
@@ -43,22 +44,23 @@ namespace Xeres.CryptoCore
                             }
                             encStream.FlushFinalBlock();
                             encStream.Close();
-                            encryptedData = memStreamEncryptedData.ToArray();
+                            encryptedData.Ciphertext = memStreamEncryptedData.ToArray();
                         }
-                        _tag = transform.GetTag();
+                        encryptedData.AdditionalAuthenticatedData = internalAlgorithm.AdditionalAuthenticatedData;
+                        encryptedData.Tag = transform.GetTag();
                     }
                 }
             }
             else
             {
                 encryptedData = base.Encrypt(algorithm, plaintext);
-
+                
                 using (HMACAlgorithm)
                 {
-                    byte[] messageToMac = new byte[algorithm.IV.Length + encryptedData.Length];
-                    Buffer.BlockCopy(algorithm.IV, 0, messageToMac, 0, algorithm.IV.Length);
-                    Buffer.BlockCopy(encryptedData, 0, messageToMac, algorithm.IV.Length, encryptedData.Length);
-                    _tag = HMACAlgorithm.ComputeHash(messageToMac);
+                    byte[] messageToMac = new byte[encryptedData.IV.Length + encryptedData.Ciphertext.Length];
+                    Buffer.BlockCopy(encryptedData.IV, 0, messageToMac, 0, encryptedData.IV.Length);
+                    Buffer.BlockCopy(encryptedData.Ciphertext, 0, messageToMac, encryptedData.IV.Length, encryptedData.Ciphertext.Length);
+                    encryptedData.Tag = HMACAlgorithm.ComputeHash(messageToMac);
                 }
             }
 

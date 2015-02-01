@@ -19,9 +19,11 @@ namespace Xeres.CryptoCore
     /// </summary>
     public class SymmetricEncryption
     {
-        public virtual byte[] Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)
+        public virtual EncryptedData Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)
         {
             algorithm.Instance.GenerateIV();
+            EncryptedData encryptedData = new EncryptedData(){ IV = algorithm.IV};
+
             using (MemoryStream memStreamEncryptedData = new MemoryStream())
             {
 
@@ -38,10 +40,11 @@ namespace Xeres.CryptoCore
                             throw new Exception("Error while writing encrypted data to the stream: \n"
                                                 + ex.Message);
                         }
-                        encStream.FlushFinalBlock();
-                        encStream.Close();
-                        return memStreamEncryptedData.ToArray();
-                    }
+                            encStream.FlushFinalBlock();
+                            encStream.Close();
+                            encryptedData.Ciphertext = memStreamEncryptedData.ToArray();
+                            return encryptedData;
+                        }
                 }
             }
         }

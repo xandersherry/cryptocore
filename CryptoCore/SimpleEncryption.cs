@@ -44,13 +44,12 @@ namespace Xeres.CryptoCore
             algorithm.Key = Convert.FromBase64String(key);
             algorithm.IV = SecureRandom.GetRandomBytes(IV_LENGTH);
 
-            byte[] encryptedMessage = encryptor.Encrypt(algorithm, transformer.GetBytes(plaintext));
-            byte[] tag = encryptor.GetTag();
+            EncryptedData encryptedData = encryptor.Encrypt(algorithm, transformer.GetBytes(plaintext));
 
-            byte[] output = new byte[algorithm.IV.Length + tag.Length + encryptedMessage.Length];
-            Buffer.BlockCopy(algorithm.IV, 0, output, 0, algorithm.IV.Length);
-            Buffer.BlockCopy(tag, 0, output, algorithm.IV.Length, tag.Length);
-            Buffer.BlockCopy(encryptedMessage, 0, output, algorithm.IV.Length + tag.Length, encryptedMessage.Length);
+            byte[] output = new byte[encryptedData.IV.Length + encryptedData.Tag.Length + encryptedData.Ciphertext.Length];
+            Buffer.BlockCopy(encryptedData.IV, 0, output, 0, encryptedData.IV.Length);
+            Buffer.BlockCopy(encryptedData.Tag, 0, output, algorithm.IV.Length, encryptedData.Tag.Length);
+            Buffer.BlockCopy(encryptedData.Ciphertext, 0, output, algorithm.IV.Length + encryptedData.Tag.Length, encryptedData.Ciphertext.Length);
 
             return Convert.ToBase64String(output);
         }
@@ -81,10 +80,7 @@ namespace Xeres.CryptoCore
             algorithm.IV = iv;
             algorithm.Tag = tag;
 
-            return transformer.GetString(decryptor.Decrypt(algorithm, ciphertext));
-            
+            return transformer.GetString(decryptor.Decrypt(algorithm, ciphertext));   
         }
-
-
     }
 }

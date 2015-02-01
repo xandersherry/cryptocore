@@ -9,7 +9,7 @@ namespace CryptoCoreTests.AlgorithmTests
     [TestClass]
     public class DESTests
     {
-        private string testClearText = "This is a string to be used for testing.";
+        private string testPlaintext = "This is a string to be used for testing.";
         private SymmetricEncryption encryptor = null;
         private SymmetricEncryption decryptor = null;
         private ISymmetricEncryptionAlgorithm eAlgorithm = null;
@@ -21,79 +21,66 @@ namespace CryptoCoreTests.AlgorithmTests
         [TestInitialize]
         public void DESTestSetup()
         {
+            key = SecureRandom.GetRandomBytes(8);
             encryptor = new SymmetricEncryption();
             decryptor = new SymmetricEncryption();
-            eAlgorithm = new DESAlgorithm();
-            dAlgorithm = new DESAlgorithm();
+            eAlgorithm = new DESAlgorithm(){ Key = key};
+            dAlgorithm = new DESAlgorithm(){Key = key};
             transformer = new AsciiTransformer();
-            key = SecureRandom.GetRandomBytes(8);
-
         }
 
         [TestMethod]
         public void DES_Encrypting_And_Decrypting_Results_In_Same_String()
         {
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-            eAlgorithm.Key = key;
+            dAlgorithm.IV = encryptedData.IV;
 
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-
-            dAlgorithm.Key = key;
-            dAlgorithm.IV = eAlgorithm.IV;
-
-            byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
         [TestMethod]
         public void DES_Decrypting_With_Incorrect_Key_Fails()
         {
-            eAlgorithm.Key = key;
-
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
             dAlgorithm.Key = SecureRandom.GetRandomBytes(8);
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
 
             Exception ex = null;
-            byte[] decryptedPlainText = new byte[1];
+            byte[] decryptedPlaintext = new byte[1];
             try
             {
-                decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception caughtEx)
             {
                 ex = caughtEx;
             }
 
-            Assert.AreNotEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreNotEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
         public void DES_Decrypting_With_Incorrect_IV_Fails()
         {
-            eAlgorithm.Key = key;
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-
-
-            dAlgorithm.Key = key;
             dAlgorithm.IV = SecureRandom.GetRandomBytes(8);
 
             Exception ex = null;
-            byte[] decryptedPlainText = new byte[1];
+            byte[] decryptedPlaintext = new byte[1];
             try
             {
-                decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception caughtEx)
             {
                 ex = caughtEx;
             }
 
-            Assert.AreNotEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreNotEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
     }
 }

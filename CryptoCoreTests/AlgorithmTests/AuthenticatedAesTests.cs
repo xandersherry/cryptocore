@@ -11,7 +11,7 @@ namespace CryptoCoreTests.AlgorithmTests
     [TestClass]
     public class AuthenticatedAesTests
     {
-        private string testClearText = "This is a string to be used for testing.";
+        private string testPlaintext = "This is a string to be used for testing.";
         private AuthenticatedSymmetricEncryption encryptor;
         private AuthenticatedSymmetricEncryption decryptor;
         private ICngSymmetricEncryptionAlgorithm eAlgorithm;
@@ -23,191 +23,168 @@ namespace CryptoCoreTests.AlgorithmTests
         [TestInitialize]
         public void AuthenticatedAesTestSetup()
         {
+            key = SecureRandom.GetRandomBytes(32);
             encryptor = new AuthenticatedSymmetricEncryption();
             decryptor = new AuthenticatedSymmetricEncryption();
-            eAlgorithm = new AuthenticatedAesAlgorithm();
-            dAlgorithm = new AuthenticatedAesAlgorithm();
+            eAlgorithm = new AuthenticatedAesAlgorithm(){Key = key};
+            dAlgorithm = new AuthenticatedAesAlgorithm(){Key = key};
             transformer = new AsciiTransformer();
-            key = SecureRandom.GetRandomBytes(32);
             additonalAuthenticatedData = transformer.GetBytes("Additional Authenticated Data");
         }
 
         [TestMethod]
         public void AEAD_Encrypting_And_Decrypting_Results_In_Same_String()
         {
-            eAlgorithm.Key = key;
-          
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-            byte[] tag = encryptor.GetTag();
+            dAlgorithm.IV = encryptedData.IV;
+            dAlgorithm.Tag = encryptedData.Tag;
 
-            dAlgorithm.Key = key;
-            dAlgorithm.IV = eAlgorithm.IV;
-            dAlgorithm.Tag = tag;
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-            byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
         public void AEAD_CCM_Mode_Encrypting_And_Decrypting_Results_In_Same_String()
         {
-            eAlgorithm.Key = key;
-
             eAlgorithm.ChainingMode = CngChainingMode.Ccm;
 
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-            byte[] tag = encryptor.GetTag();
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-            dAlgorithm.Key = key;
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
             dAlgorithm.ChainingMode = CngChainingMode.Ccm;
-            dAlgorithm.Tag = tag;
+            dAlgorithm.Tag = encryptedData.Tag;
 
-            byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
 
         [TestMethod]
         public void AEAD_Decrypting_With_Incorrect_Tag_Fails()
         {
-            eAlgorithm.Key = key;
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-
-            dAlgorithm.Key = key;
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
             dAlgorithm.Tag = SecureRandom.GetRandomBytes(16);
 
             Exception exception = null;
             try
             {
-                decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
                 exception = ex;
             }
+
             Assert.IsNotNull(exception);
         }
 
         [TestMethod]
         public void AEAD_Decrypting_With_Incorrect_Key_Fails()
         {
-            eAlgorithm.Key = key;
-
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-            byte[] tag = encryptor.GetTag();
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
             dAlgorithm.Key = SecureRandom.GetRandomBytes(32);
-            dAlgorithm.IV = eAlgorithm.IV;
-            dAlgorithm.Tag = tag;
+            dAlgorithm.IV = encryptedData.IV;
+            dAlgorithm.Tag = encryptedData.Tag;
 
             Exception exception = null;
             try
             {
-                decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
                 exception = ex;
             }
+
             Assert.IsNotNull(exception);
         }
 
         [TestMethod]
         public void AEAD_Decrypting_With_Mismatched_Chaining_Mode_Fails()
         {
-            eAlgorithm.Key = key;
             eAlgorithm.ChainingMode = CngChainingMode.Ccm;
             
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-            byte[] tag = encryptor.GetTag();
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-            dAlgorithm.Key = key;
-            dAlgorithm.IV = eAlgorithm.IV;
-            dAlgorithm.Tag = tag;
+            dAlgorithm.IV = encryptedData.IV;
+            dAlgorithm.Tag = encryptedData.Tag;
 
             Exception exception = null;
             try
             {
-                decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
                 exception = ex;
             }
+
             Assert.IsNotNull(exception);
         }
-
 
         [TestMethod]
         public void AEAD_Decrypting_With_Incorrect_IV_Fails()
         {
-            eAlgorithm.Key = key;
-
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-            byte[] tag = encryptor.GetTag();
-
-            dAlgorithm.Key = key;
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
+   
             dAlgorithm.IV = SecureRandom.GetRandomBytes(12);
-            dAlgorithm.Tag = tag;
+            dAlgorithm.Tag = encryptedData.Tag;
 
             Exception exception = null;
             try
             {
-                decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
                 exception = ex;
             }
+
             Assert.IsNotNull(exception);
         }
 
         public void AEAD_Encrypting_And_Decrypting_With_AAD_Results_In_Same_String()
         {
-            eAlgorithm.Key = key;
             eAlgorithm.AdditionalAuthenticatedData = additonalAuthenticatedData;
 
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-            byte[] tag = encryptor.GetTag();
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
+        
+            dAlgorithm.IV = encryptedData.IV;
+            dAlgorithm.Tag = encryptedData.Tag;
+            dAlgorithm.AdditionalAuthenticatedData = encryptedData.AdditionalAuthenticatedData;
 
-            dAlgorithm.Key = key;
-            dAlgorithm.IV = eAlgorithm.IV;
-            dAlgorithm.Tag = tag;
-            dAlgorithm.AdditionalAuthenticatedData = additonalAuthenticatedData;
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-            byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
         public void AEAD_Decrypting_With_Incorrect_AAD_Fails()
         {
-            eAlgorithm.Key = key;
             eAlgorithm.AdditionalAuthenticatedData = additonalAuthenticatedData;
 
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
-            byte[] tag = encryptor.GetTag();
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-            dAlgorithm.Key = key;
-            dAlgorithm.IV = eAlgorithm.IV;
-            dAlgorithm.Tag = tag;
+            dAlgorithm.IV = encryptedData.IV;
+            dAlgorithm.Tag = encryptedData.Tag;
             dAlgorithm.AdditionalAuthenticatedData = SecureRandom.GetRandomBytes(29);
 
             Exception exception = null;
             try
             {
-                decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
                 exception = ex;
             }
+
             Assert.IsNotNull(exception);
         }
     }

@@ -11,9 +11,9 @@ namespace CryptoCoreTests.AlgorithmTests
     [TestClass]
     public class AesTests
     {
-        private string testClearText = "This is a string to be used for testing.";
-        private string testClearTextWithExtendedCharacters = "This is å test string with ëxteñded charactérs.";
-        private string testClearTextWithChineseCharacters = "这是额外的扩展字符集的测试字符串中国人。";
+        private string testPlaintext = "This is a string to be used for testing.";
+        private string testPlaintextWithExtendedCharacters = "This is å test string with ëxteñded charactérs.";
+        private string testPlaintextWithChineseCharacters = "这是额外的扩展字符集的测试字符串中国人。";
         private SymmetricEncryption encryptor = null;
         private SymmetricEncryption decryptor = null;
         private AuthenticatedSymmetricEncryption authenticatedEncryptor;
@@ -41,81 +41,81 @@ namespace CryptoCoreTests.AlgorithmTests
         [TestMethod]
         public void AES_Encrypting_And_Decrypting_Results_In_Same_String()
         {
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
             
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
 
-            byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
         public void AES_Encrypting_And_Decrypting_String_With_ExtendedCharacters_Results_In_Same_String()
         {
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearTextWithExtendedCharacters));
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintextWithExtendedCharacters));
 
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
 
-            byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-            Assert.AreEqual(testClearTextWithExtendedCharacters, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintextWithExtendedCharacters, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
         public void AES_Encrypting_And_Decrypting_String_With_Chinese_Characters_Results_In_Same_String()
         {
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearTextWithChineseCharacters));
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintextWithChineseCharacters));
 
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
 
-            byte[] decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
+            byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-            Assert.AreEqual(testClearTextWithChineseCharacters, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintextWithChineseCharacters, transformer.GetString(decryptedPlaintext));
         }
 
 
         [TestMethod]
         public void AES_Decrypting_With_Incorrect_Key_Fails()
         {
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
             dAlgorithm.Key = SecureRandom.GetRandomBytes(32);
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
 
             Exception ex = null;
-            byte[] decryptedPlainText = new byte[1];
+            byte[] decryptedPlaintext = new byte[1];
             try
             {
-                decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
+                decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception caughtEx)
             {
                 ex = caughtEx;
             }
 
-            Assert.AreNotEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreNotEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
         public void AES_Decrypting_With_Incorrect_IV_Fails()
         {
-            byte[] ciphertext = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
             dAlgorithm.IV = SecureRandom.GetRandomBytes(16);
 
             Exception ex = null;
-            byte[] decryptedPlainText = new byte[1];
+            byte[] decryptedPlaintext = new byte[1];
             try
             {
-                 decryptedPlainText = decryptor.Decrypt(dAlgorithm, ciphertext);
+                 decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception caughtEx)
             {
                 ex = caughtEx;
             }
 
-            Assert.AreNotEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreNotEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
@@ -124,15 +124,15 @@ namespace CryptoCoreTests.AlgorithmTests
             validationKey = SecureRandom.GetRandomBytes(32);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA256(){ Key = validationKey};
 
-            byte[] ciphertext = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
   
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA256(){Key = validationKey};
-            authenticatedDecrytor.Tag = authenticatedEncryptor.GetTag();
-            dAlgorithm.IV = eAlgorithm.IV;
+            authenticatedDecrytor.Tag = encryptedData.Tag;
+            dAlgorithm.IV = encryptedData.IV;
 
-            byte[] decryptedPlainText = authenticatedDecrytor.Decrypt(dAlgorithm, ciphertext);
+            byte[] decryptedPlaintext = authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
@@ -141,15 +141,15 @@ namespace CryptoCoreTests.AlgorithmTests
             validationKey = SecureRandom.GetRandomBytes(64);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA512(){Key = validationKey};
 
-            byte[] ciphertext = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
      
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA512(){Key = validationKey};
-            authenticatedDecrytor.Tag = authenticatedEncryptor.GetTag();
-            dAlgorithm.IV = eAlgorithm.IV;
+            authenticatedDecrytor.Tag = encryptedData.Tag;
+            dAlgorithm.IV = encryptedData.IV;
 
-            byte[] decryptedPlainText = authenticatedDecrytor.Decrypt(dAlgorithm, ciphertext);
+            byte[] decryptedPlaintext = authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
@@ -158,15 +158,15 @@ namespace CryptoCoreTests.AlgorithmTests
             validationKey = SecureRandom.GetRandomBytes(20);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA1(){Key = validationKey};
 
-            byte[] ciphertext = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA1(){Key = validationKey};
-            authenticatedDecrytor.Tag = authenticatedEncryptor.GetTag();
-            dAlgorithm.IV = eAlgorithm.IV;
+            authenticatedDecrytor.Tag = encryptedData.Tag;
+            dAlgorithm.IV = encryptedData.IV;
 
-            byte[] decryptedPlainText = authenticatedDecrytor.Decrypt(dAlgorithm, ciphertext);
+            byte[] decryptedPlaintext = authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
-            Assert.AreEqual(testClearText, transformer.GetString(decryptedPlainText));
+            Assert.AreEqual(testPlaintext, transformer.GetString(decryptedPlaintext));
         }
 
         [TestMethod]
@@ -175,16 +175,16 @@ namespace CryptoCoreTests.AlgorithmTests
            validationKey = SecureRandom.GetRandomBytes(32);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA256(){ Key = validationKey};
 
-            byte[] ciphertext = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
   
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA256(){Key = validationKey};
             authenticatedDecrytor.Tag = SecureRandom.GetRandomBytes(32);
-            dAlgorithm.IV = eAlgorithm.IV;
+            dAlgorithm.IV = encryptedData.IV;
   
             Exception exception = null;
             try
             {
-                authenticatedDecrytor.Decrypt(dAlgorithm, ciphertext);
+                authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
@@ -199,16 +199,16 @@ namespace CryptoCoreTests.AlgorithmTests
             validationKey = SecureRandom.GetRandomBytes(32);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA256(){ Key = validationKey};
 
-            byte[] ciphertext = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
   
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA256(){Key = SecureRandom.GetRandomBytes(32)};
-            authenticatedDecrytor.Tag = authenticatedEncryptor.GetTag();
-            dAlgorithm.IV = eAlgorithm.IV;
+            authenticatedDecrytor.Tag = encryptedData.Tag;
+            dAlgorithm.IV = encryptedData.IV;
 
             Exception exception = null;
             try
             {
-                authenticatedDecrytor.Decrypt(dAlgorithm, ciphertext);
+                authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
@@ -223,16 +223,16 @@ namespace CryptoCoreTests.AlgorithmTests
             validationKey = SecureRandom.GetRandomBytes(32);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA256(){ Key = validationKey};
 
-            byte[] ciphertext = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
   
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA1(){Key = validationKey};
-            authenticatedDecrytor.Tag = authenticatedEncryptor.GetTag();
-            dAlgorithm.IV = eAlgorithm.IV;
+            authenticatedDecrytor.Tag = encryptedData.Tag;
+            dAlgorithm.IV = encryptedData.IV;
 
             Exception exception = null;
             try
             {
-                authenticatedDecrytor.Decrypt(dAlgorithm, ciphertext);
+                authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
             }
             catch (Exception ex)
             {
@@ -247,16 +247,16 @@ namespace CryptoCoreTests.AlgorithmTests
             validationKey = SecureRandom.GetRandomBytes(32);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA256(){ Key = validationKey};
 
-            byte[] ciphertext = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testClearText));
+            EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
   
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA256(){Key = validationKey};
-            authenticatedDecrytor.Tag = authenticatedEncryptor.GetTag();
-            dAlgorithm.IV = eAlgorithm.IV;
+            authenticatedDecrytor.Tag = encryptedData.Tag;
+            dAlgorithm.IV = encryptedData.IV;
 
             Exception exception = null;
             try
             {
-                authenticatedDecrytor.Decrypt(dAlgorithm, SecureRandom.GetRandomBytes(ciphertext.Length));
+                authenticatedDecrytor.Decrypt(dAlgorithm, SecureRandom.GetRandomBytes(encryptedData.Ciphertext.Length));
             }
             catch (Exception ex)
             {
