@@ -13,7 +13,5 @@ namespace Xeres.CryptoCore
 
         bool IsCngAlgorithm { get;  }
         SymmetricAlgorithm Instance { get; }
-
-        CipherMode Mode { get; set; }
     }
 }
