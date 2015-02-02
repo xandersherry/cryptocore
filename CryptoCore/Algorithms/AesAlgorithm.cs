@@ -38,11 +38,6 @@ namespace Xeres.CryptoCore.Algorithms
             set { algorithmInstance.IV = value; }
         }
 
-        public CipherMode Mode
-        {
-            get { return algorithmInstance.Mode; }
-            set { algorithmInstance.Mode = value; }
-        }
 
         public bool IsCngAlgorithm
         {

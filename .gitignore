@@ -1,0 +1,5 @@
+*.suo
+CryptoCore/bin/
+CryptoCore/obj/
+CryptoCoreTests/bin/
+CryptoCoreTests/obj/
