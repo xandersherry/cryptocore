@@ -53,6 +53,12 @@ namespace Xeres.CryptoCore.Algorithms
             }
         }
 
+        public CipherMode Mode
+        {
+            get { return algorithmInstance.Mode; }
+            set { algorithmInstance.Mode = value; }
+        }
+
         public bool IsCngAlgorithm
         {
             get { return false; }

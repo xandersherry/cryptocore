@@ -54,11 +54,11 @@ namespace CryptoCoreTests.AlgorithmTests
         [TestMethod]
         public void AES_CFB_Mode_Encrypting_And_Decrypting_Results_In_Same_String()
         {
-            eAlgorithm.Instance.Mode = CipherMode.CFB;
+            eAlgorithm.Mode = CipherMode.CFB;
 
             EncryptedData encryptedData = encryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
-            dAlgorithm.Instance.Mode = CipherMode.CFB;
+            dAlgorithm.Mode = CipherMode.CFB;
             dAlgorithm.IV = encryptedData.IV;
 
             byte[] decryptedPlaintext = decryptor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
@@ -156,14 +156,14 @@ namespace CryptoCoreTests.AlgorithmTests
         {
             validationKey = SecureRandom.GetRandomBytes(32);
             authenticatedEncryptor.HMACAlgorithm = new HMACSHA256() { Key = validationKey };
-            eAlgorithm.Instance.Mode = CipherMode.CFB;
+            eAlgorithm.Mode = CipherMode.CFB;
             
             EncryptedData encryptedData = authenticatedEncryptor.Encrypt(eAlgorithm, transformer.GetBytes(testPlaintext));
 
             authenticatedDecrytor.HMACAlgorithm = new HMACSHA256() { Key = validationKey };
             authenticatedDecrytor.Tag = encryptedData.Tag;
             dAlgorithm.IV = encryptedData.IV;
-            dAlgorithm.Instance.Mode = CipherMode.CFB;
+            dAlgorithm.Mode = CipherMode.CFB;
 
             byte[] decryptedPlaintext = authenticatedDecrytor.Decrypt(dAlgorithm, encryptedData.Ciphertext);
 
