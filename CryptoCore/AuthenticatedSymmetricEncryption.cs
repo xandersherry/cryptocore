@@ -13,11 +13,6 @@ namespace Xeres.CryptoCore
     public class AuthenticatedSymmetricEncryption : SymmetricEncryption
     {
 
-        public AuthenticatedSymmetricEncryption()
-        {
-            HMACAlgorithm = new HMACSHA256();
-        }
-
         public override EncryptedData Encrypt(ISymmetricEncryptionAlgorithm algorithm, byte[] plaintext)
         {
             algorithm.Instance.GenerateIV();
@@ -53,6 +48,9 @@ namespace Xeres.CryptoCore
             }
             else
             {
+                if (HMACAlgorithm == null)
+                    throw new NullReferenceException("The HMACAlgorithm property must be set to an instance of an HMAC algorithm and the key specificed before encryption can occur.");
+
                 encryptedData = base.Encrypt(algorithm, plaintext);
                 
                 using (HMACAlgorithm)
@@ -97,6 +95,9 @@ namespace Xeres.CryptoCore
             }
             else
             {
+                if (HMACAlgorithm == null)
+                    throw new NullReferenceException("The HMACAlgorithm property must be set to an instance of an HMAC algorithm and the key specificed before decryption can occur.");
+                
                 using (HMACAlgorithm)
                 {
                     byte[] iv = algorithm.IV;
