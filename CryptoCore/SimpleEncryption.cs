@@ -32,22 +32,31 @@ namespace Xeres.CryptoCore
         }
 
         /// <summary>
-        /// 
+        /// Encrypts textual data. Submit any UTF-8 (or ASCII) plaintext string and a strong random key for encryption. 
         /// </summary>
         /// <param name="key">A Base-64 encoded, 128-bit key</param>
         /// <param name="plaintext">A UTF-8 string that is the plaintext message to be encrypted</param>
-        /// <returns>Base-64 encoded string that includes an IV, a tag, and the ciphertext of the data encrypted with the key</returns>
+        /// <returns>Base-64 encoded string that includes a version, an IV, a tag, and the ciphertext of the data encrypted with the key</returns>
         public static string Encrypt(string key, string plaintext)
+        {
+            return Encrypy(key, new UTF8Transformer().GetBytes(plaintext));
+        }
+
+        /// <summary>
+        /// Encrypts binary data. Submit any data as a byte array, and a strong random key to encrypt it. 
+        /// </summary>
+        /// <param name="key">A Base-64 encoded, 128-bit key</param>
+        /// <param name="dataToEncrypt">Base-64 encoded string that includes a version, an IV, a tag, and the ciphertext of the data encrypted with the key</param>
+        /// <returns></returns>
+        public static string Encrypy(string key, byte[] dataToEncrypt)
         {
             AuthenticatedAesAlgorithm algorithm = new AuthenticatedAesAlgorithm();
             AuthenticatedSymmetricEncryption encryptor = new AuthenticatedSymmetricEncryption();
-            UTF8Transformer transformer = new UTF8Transformer();
             
             algorithm.Key = Convert.FromBase64String(key);
-            algorithm.IV = SecureRandom.GetRandomBytes(IV_LENGTH);
             algorithm.AdditionalAuthenticatedData = BitConverter.GetBytes(CURRENT_VERSION);
 
-            EncryptedData encryptedData = encryptor.Encrypt(algorithm, transformer.GetBytes(plaintext));
+            EncryptedData encryptedData = encryptor.Encrypt(algorithm, dataToEncrypt); 
 
             byte[] output = new byte[VERSION_LENGTH + IV_LENGTH + TAG_LENGTH + encryptedData.Ciphertext.Length];
             Buffer.BlockCopy(BitConverter.GetBytes(CURRENT_VERSION), 0, output, 0, VERSION_LENGTH);
