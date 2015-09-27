@@ -12,5 +12,14 @@
     <description>$description$</description>
     <releaseNotes>Initial Package.</releaseNotes>
     <copyright>Copyright 2015</copyright>
+	<references> 
+		<group>
+			<reference file="Security.Cryptography.dll" />
+			<reference file="Xeres.CryptoCore.dll" />
+		</group>
+	</references>
   </metadata>
+  <files>
+	<file src="bin\Release\Security.Cryptography.dll" target="lib\net45" /> 
+  </files>
 </package>
