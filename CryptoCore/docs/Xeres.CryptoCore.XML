@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Xeres.CryptoCore</name>
+    </assembly>
+    <members>
+        <member name="T:Xeres.CryptoCore.Algorithms.AesAlgorithm">
+            <summary>
+            AES is an authenticated algorithm, protecting message integrity through
+            the use of encrypt-then-MAC using a configurable HMAC variant.  The 
+            default configuration uses HMAC-SHA256.  
+            </summary>
+        </member>
+        <member name="T:Xeres.CryptoCore.Algorithms.AuthenticatedAesAlgorithm">
+            <summary>
+            AuthenticatedAES is an AEAD algorithm implementing the CNG
+            modes of operation on top of AES.  It supports both GCM and CCM modes
+            of operation to provide both confidentiality and integrity of messages. 
+            </summary>
+        </member>
+        <member name="T:Xeres.CryptoCore.Algorithms.DESAlgorithm">
+            <summary>
+            DES is a symmetric encryption algorithm included for backwards
+            compatibility purposes and only for existing systems that already use 
+            it and cannot be updated to support a secure algorithm. It should not 
+            be used for new systems for any reason; 
+            the AuthenticatedSymmetricEncryption API and the algorithms it supports 
+            should be used instead.
+            </summary>
+        </member>
+        <member name="T:Xeres.CryptoCore.Algorithms.RC2Algorithm">
+            <summary>
+            RC2 is a symmetric encryption algorithm included for backwards
+            compatibility purposes and only for existing systems that already use 
+            it and cannot be updated to support a secure algorithm. It should not 
+            be used for new systems for any reason; 
+            the AuthenticatedSymmetricEncryption API and the algorithms it supports 
+            should be used instead.
+            </summary>
+        </member>
+        <member name="T:Xeres.CryptoCore.Algorithms.RijndaelAlgorithm">
+            <summary>
+            Rijndeal is a symmetric encryption algorithm, and this un-authenticated
+            form is included for backwards compatibility purposes only.  It should 
+            not be used for new systems unless a suitable  authentication mechanism 
+            is also implemented and used to ensure message integrity.  Generally 
+            the AuthenticatedSymmetricEncryption API and the algorithms it supports
+            should be used instead.
+            </summary>
+        </member>
+        <member name="T:Xeres.CryptoCore.Algorithms.TripleDESAlgorithm">
+            <summary>
+            Triple-DES is a symmetric encryption algorithm included for backwards
+            compatibility purposes only.  It should not be used for new systems 
+            for any reason;  the AuthenticatedSymmetricEncryption API and the 
+            algorithms it supports should be used instead.
+            </summary>
+        </member>
+        <member name="T:Xeres.CryptoCore.AuthenticatedSymmetricEncryption">
+            <summary>
+            AuthenticatedSymmetricEncryption is the API for authenticated 
+            symmetric encrpytion, and is the preferred API when you require
+            more flexibility than is provided by the SimpleEncryption API. 
+            </summary>
+        </member>
+        <member name="T:Xeres.CryptoCore.SimpleEncryption">
+            <summary>
+            The SimpleEncryption API provides the simplest way to securely encrypt
+            and decrypt data for use in a .NET application.  It provides 
+            authenticated encryption to ensure both the confidentially and integrity
+            of messages protected by this API.  
+            </summary>
+        </member>
+        <member name="M:Xeres.CryptoCore.SimpleEncryption.GenerateKey">
+            <summary>
+            Generates a new random, Base-64 encoded, 128-bit key
+            </summary>
+            <returns>Base-64 encoded string</returns>
+        </member>
+        <member name="M:Xeres.CryptoCore.SimpleEncryption.Encrypt(System.String,System.String)">
+            <summary>
+            Encrypts textual data. Submit any UTF-8 (or ASCII) plaintext string and a strong random key for encryption. 
+            </summary>
+            <param name="key">A Base-64 encoded, 128-bit key</param>
+            <param name="plaintext">A UTF-8 string that is the plaintext message to be encrypted</param>
+            <returns>Base-64 encoded string that includes a version, an IV, a tag, and the ciphertext of the data encrypted with the key</returns>
+        </member>
+        <member name="M:Xeres.CryptoCore.SimpleEncryption.Encrypy(System.String,System.Byte[])">
+            <summary>
+            Encrypts binary data. Submit any data as a byte array, and a strong random key to encrypt it. 
+            </summary>
+            <param name="key">A Base-64 encoded, 128-bit key</param>
+            <param name="dataToEncrypt">Base-64 encoded string that includes a version, an IV, a tag, and the ciphertext of the data encrypted with the key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Xeres.CryptoCore.SimpleEncryption.Decrypt(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="key">A Base-64 encoded, 128-bit key</param>
+            <param name="encryptedData">The Base-64 encoded string containing the IV, tag, and ciphertext</param>
+            <returns>A UTF-8 string containing the plaintext message</returns>
+        </member>
+        <member name="T:Xeres.CryptoCore.SymmetricEncryption">
+            <summary>
+            The SymmetricEncryption API is generally for backwards compatibility
+            purposes only.  It is an API for un-authenticated symmetric encryption
+            which means that in order to implemented it securely an authentication
+            mechananism to ensure message integrity must also be implemented and 
+            used.
+            You should generally prefer to use the AuthenticatedSymmetricEncryption
+            API instead, which integrates message authentication automatically.
+            </summary>
+        </member>
+    </members>
+</doc>

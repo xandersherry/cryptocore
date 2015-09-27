@@ -118,8 +118,6 @@ namespace Xeres.CryptoCore
                 }
                 return base.Decrypt(algorithm, ciphertext);
             }
-
-            return null;
         }
 
         private byte[] _tag;
